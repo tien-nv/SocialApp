@@ -1,0 +1,88 @@
+﻿Mô hình của ứng dụng được custom lại trong quy mô nhỏ của một công ty như sau:
+
+Bounder của ứng dụng chính là công ty:
+
+=> Cấu trúc cây phân cấp của các đối tượng được hướng đến trong ứng dụng như sau:
+
+issue: Cần phải tham khảo thêm về các công việc của từng đối tượng trong công ty.
+
+
+
+1. Một công ty ------> nhiều group(group ở đây có thể là phòng ban hoặc là một teams ... ). Bản thân công ty cũng là một group( ơ level cao nhất)
+
+group public mặc định của công ty sẽ là trạng thái public có nghĩa là user nào cũng có thể truy cập vào.
+
+các group private sẽ tính ở vị trí từ cấp CEO(admin) đổ lại.
+
+-> Quan hệ 1 - n 
+
+2. Một group ------> nhiều nhân viên (nhân viên ở đây có thể là admin, manager... hoặc nhân viên với chức vụ bình thường…). Một nhân viên có thể nhiều group, nếu chuyển sang group mới mà group mới có cấp bậc ngang hàng với group cũ thì sẽ không còn thuộc group cũ.
+Một nhân viên thuộc group cấp thấp thì sẽ không thể tham gia, làm bất kì điều gì ở group cấp cao hơn.
+
+-> Quan hệ 1 – n
+
+4. Một nhân viên ---(quản lý)---> đồ dùng cá nhân do công ty cung cấp
+
+-> Quan hệ 1 – n
+
+5. Một nhân viên ---(quản lý)--- > quản lý nhiều group. Admin ở group cao hơn sẽ có thể quản lý group ở cấp thấp hơn.
+
+→ Quan hệ n-m
+
+
+
+=> Các thực thể có thể có trong dự án:
+
+- Group ( cả công ty, phòng ban, teams, …)
+	+ Các thuộc tính:
+    1. group_id, auto_increment (primary key)
+    2. group_name not null
+    3. is_public bool default false
+    4. create_at, có mặc định
+    5. update_at, có mặc định
+    6. 
+
+=> cần 1 bảng group_group để biết cây phân cấp của group để biết xem một người dùng được phép truy cập vào những group nào.
+
+- GroupRelationship
+	+ Các thuộc tính:
+    1. group_parent not null, foreign key
+    2. group_child not null, foreign key
+    3. primary key (group_parent + group_child).
+
+- Đồ dùng trong công ty (màn hình, máy tính, bàn làm việc,…)
+- nhân viên ( CEO, CTO, manager, employee…)
+=> bảng của nhân viên:
+
+Chức năng AI là quét bản CV or sơ yếu lý lịch sau đó detect ra thành thông tin của user.
+	
+	-User
+    1. user_id int , in_creament, not null, primary key\
+    2. email,
+    3. phone number,
+    4. user_icn varchar, not null,          *identity_card_number
+    5. date_icn,
+    6. place_icn,
+    7. password default 12345678,
+    8. user_name,
+    9. user_avatar_url,
+    10. salary default 0, đơn vị là đô la
+    11. home_town,
+    12. address,
+    13. date_birth,
+    14. job,
+    15. isAdmin default false,
+    16. group_id not null, foreign key (group mà nhân viên đó thuộc về. Nếu nhân viên đó là một admin thì nhân viên đó có thể truy cập vào các group khác - group con có group này là group cha.).
+    17. create_at,
+    18. update_at,
+
+=> nhân viên sẽ có riêng các chức năng như đăng bài post, chat, ....
+
+=> bảng của cơ sở vật chất
+	
+	- infrastructure
+    1. infras_id int , not null, primary key
+    2. infras_name text, not null,
+    3. user_owner int foreign key (nhân viên sở hữu),
+    4. create_at,
+
